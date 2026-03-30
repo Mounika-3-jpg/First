@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection — users can read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+
+    // Students collection — anyone authenticated can read; only the owner or a teacher can write
+    match /students/{studentId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Polls — anyone authenticated can read; teachers create, students update votes
+    match /polls/{pollId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+    }
+  }
+}
